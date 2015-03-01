@@ -2,7 +2,6 @@ package ordered_map
 
 import (
 	"fmt"
-	"bytes"
 )
 
 // Taken from
@@ -10,12 +9,18 @@ import (
 // http://code.activestate.com/recipes/576693/
 // https://github.com/nicklockwood/OrderedDictionary/blob/master/OrderedDictionary/OrderedDictionary.m
 // http://golang.org/src/sort/sort.go?s=5371:5390#L223
+// http://pymotw.com/2/collections/ordereddict.html
+
 type OrderedMap struct {
 	store map[string]int
 	mapper map[string]*Node
 	root *Node
 }
 
+// type KeyValuePair interface {
+// 	Key()
+// 	Value()
+// }
 type KVPair struct {
 	Key string
 	Value int
@@ -23,23 +28,6 @@ type KVPair struct {
 
 func (k *KVPair) String() string {
 	return fmt.Sprintf("%v:%v", k.Key, k.Value)
-}
-
-type Node struct {
-	Prev *Node
-	Next *Node
-	Key string
-}
-
-func NewRootNode() *Node {
-	root := &Node{}
-	root.Prev = root
-	root.Next = root
-	return root
-}
-
-func NewNode(prev *Node, next *Node, key string) *Node {
-	return &Node{Prev: prev, Next: next, Key:key}
 }
 
 func NewOrderedMap(args []*KVPair) *OrderedMap {
@@ -70,31 +58,37 @@ func (om *OrderedMap) Set(key string, value int) {
 	om.store[key] = value
 }
 
-func (om *OrderedMap) Get() {
+func (om *OrderedMap) Get(key string) (int, bool) {
+	val, ok := om.store[key]
+	return val, ok
 }
 
-func (n *Node) String() string {
-	var buffer bytes.Buffer
-	if n.Key == "" {
-		// Need to be root
-		var curr *Node
-		root := n
-		curr = root.Next
-		for curr != root {
-			buffer.WriteString(fmt.Sprintf("%s, ", curr.Key))
-			curr = curr.Next
-		}
-	} else {
-		// Else, print pointer value
-		buffer.WriteString(fmt.Sprintf("%p, ", &n))
+func (om *OrderedMap) Delete(key string) {
+	_, ok := om.store[key]
+	if ok {
+		delete(om.store, key)
 	}
-	return buffer.String()
+	root, rootFound := om.mapper[key]
+	if rootFound {
+		prev := root.Prev
+		next := root.Next
+		prev.Next = next
+		next.Prev = prev
+	}
 }
+
+
 
 func (om *OrderedMap) String() string {
-	// var buffer bytes.Buffer
-	// return fmt.Println(buffer.String())
-	return fmt.Sprintf("\nStore:%v\nHead:%v\n%v", om.store, om.root, om.mapper)
+	builder := make ([]string, len(om.store))
+
+	var index int = 0
+	for k := range om.Iter() {
+		val, _ := om.Get(k.Key)
+		builder[index] = fmt.Sprintf("%v:%v, ", k.Key, val)
+		index++
+	}
+	return fmt.Sprintf("OrderedMap%v", builder)
 }
 
 func (om *OrderedMap) Iter() <-chan *KVPair {
@@ -105,8 +99,8 @@ func (om *OrderedMap) Iter() <-chan *KVPair {
 		root := om.root
 		curr = root.Next
 		for curr != root {
-			v, _ := om.store[curr.Key]
-			keys <- &KVPair{curr.Key, v}
+			v, _ := om.store[curr.Value.(string)]
+			keys <- &KVPair{curr.Value.(string), v}
 			curr = curr.Next
 		}
 	}()
