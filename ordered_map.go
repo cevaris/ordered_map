@@ -16,33 +16,33 @@ type OrderedMap struct {
 	root *Node
 }
 
-type KeyValuePair struct {
-	key string
-	value int
+type KVPair struct {
+	Key string
+	Value int
 }
 
-func (k *KeyValuePair) String() string {
-	return fmt.Sprintf("%v:%v", k.key, k.value)
+func (k *KVPair) String() string {
+	return fmt.Sprintf("%v:%v", k.Key, k.Value)
 }
 
 type Node struct {
 	Prev *Node
-	Curr *Node
+	Next *Node
 	Key string
 }
 
 func NewRootNode() *Node {
 	root := &Node{}
 	root.Prev = root
-	root.Curr = root
+	root.Next = root
 	return root
 }
 
-func NewNode(prev *Node, curr *Node, key string) *Node {
-	return &Node{Prev: prev, Curr: curr, Key:key}
+func NewNode(prev *Node, next *Node, key string) *Node {
+	return &Node{Prev: prev, Next: next, Key:key}
 }
 
-func NewOrderedMap(args []*KeyValuePair) *OrderedMap {
+func NewOrderedMap(args []*KVPair) *OrderedMap {
 	om := &OrderedMap{
 		store: make(map[string]int),
 		mapper: make(map[string]*Node),
@@ -52,9 +52,9 @@ func NewOrderedMap(args []*KeyValuePair) *OrderedMap {
 	return om
 }
 
-func (om *OrderedMap) update(args []*KeyValuePair) {
+func (om *OrderedMap) update(args []*KVPair) {
 	for _, pair := range args {
-		om.Set(pair.key, pair.value)
+		om.Set(pair.Key, pair.Value)
 	}
 }
 
@@ -62,10 +62,10 @@ func (om *OrderedMap) Set(key string, value int) {
 	if _, ok := om.store[key]; ok == false {
 		root := om.root
 		last := root.Prev
-		last.Curr = NewNode(last, root, key)
-		root.Prev = last.Curr
-		om.mapper[key] = last.Curr
-		fmt.Println(root.Prev.Key, root.Curr.Key)
+		last.Next = NewNode(last, root, key)
+		root.Prev = last.Next
+		om.mapper[key] = last.Next
+		// fmt.Println(key, value, last.Key, last.Next.Key)
 	}
 	om.store[key] = value
 }
@@ -75,19 +75,20 @@ func (om *OrderedMap) Get() {
 
 func (n *Node) String() string {
 	var buffer bytes.Buffer
-	root := n
-	curr := root.Curr
-	for curr != root {
-		buffer.WriteString(fmt.Sprintf("%s, ", curr.Key))
-		// curr = curr.Curr
+	if n.Key == "" {
+		// Need to be root
+		var curr *Node
+		root := n
+		curr = root.Next
+		for curr != root {
+			buffer.WriteString(fmt.Sprintf("%s, ", curr.Key))
+			curr = curr.Next
+		}
+	} else {
+		// Else, print pointer value
+		buffer.WriteString(fmt.Sprintf("%p, ", &n))
 	}
 	return buffer.String()
-	// if n.Prev == nil || n.Curr == nil {
-	// 	return fmt.Sprintf("{Prev:%v,Curr:%v,Key:%s}",
-	// 	n.Prev, n.Curr, n.Key)
-	// } else {
-	// 	return "<EMPTY>"
-	// }
 }
 
 func (om *OrderedMap) String() string {
@@ -96,15 +97,17 @@ func (om *OrderedMap) String() string {
 	return fmt.Sprintf("\nStore:%v\nHead:%v\n%v", om.store, om.root, om.mapper)
 }
 
-func (om *OrderedMap) Iter() <-chan string {
-	keys := make(chan string)
+func (om *OrderedMap) Iter() <-chan *KVPair {
+	keys := make(chan *KVPair)
 	go func(){
 		defer close(keys)
+		var curr *Node
 		root := om.root
-		var curr *Node = root.Curr
-		for curr == root {
-			keys <-curr.Key
-			curr = curr.Curr
+		curr = root.Next
+		for curr != root {
+			v, _ := om.store[curr.Key]
+			keys <- &KVPair{curr.Key, v}
+			curr = curr.Next
 		}
 	}()
 	return keys
@@ -112,6 +115,10 @@ func (om *OrderedMap) Iter() <-chan string {
 
 func (om1 *OrderedMap) Compare(om2 *OrderedMap) bool {
 	return true
+}
+
+func (kv1 *KVPair) Compare(kv2 *KVPair) bool {
+	return kv1.Key == kv2.Key && kv1.Value == kv2.Value
 }
 
 
