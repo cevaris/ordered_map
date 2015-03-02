@@ -26,12 +26,17 @@ func (k *KVPair) String() string {
 	return fmt.Sprintf("%v:%v", k.Key, k.Value)
 }
 
-func NewOrderedMap(args []*KVPair) *OrderedMap {
+func NewOrderedMap() *OrderedMap {
 	om := &OrderedMap{
 		store: make(map[interface{}]interface{}),
 		mapper: make(map[interface{}]*Node),
 		root: NewRootNode(),
 	}
+	return om
+}
+
+func NewOrderedMapWithArgs(args []*KVPair) *OrderedMap {
+	om := NewOrderedMap()
 	om.update(args)
 	return om
 }
@@ -59,7 +64,7 @@ func (om *OrderedMap) Get(key interface{}) (interface{}, bool) {
 	return val, ok
 }
 
-func (om *OrderedMap) Delete(key string) {
+func (om *OrderedMap) Delete(key interface{}) {
 	_, ok := om.store[key]
 	if ok {
 		delete(om.store, key)

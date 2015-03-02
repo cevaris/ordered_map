@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func testData() []*KVPair {
+func testStringInt() []*KVPair {
 	var data []*KVPair = make([]*KVPair, 5)
 	data[0] = &KVPair{"test0", 0}
 	data[1] = &KVPair{"test1", 1}
@@ -14,21 +14,40 @@ func testData() []*KVPair {
 	return data
 }
 
+type MyStruct struct {
+	a float64
+	b bool
+}
+
+func testIntStruct() []*KVPair {
+	var data []*KVPair = make([]*KVPair, 5)
+	data[0] = &KVPair{0, &MyStruct{0.1, true}}
+	data[1] = &KVPair{1, &MyStruct{1.1, true}}
+	data[2] = &KVPair{2, &MyStruct{2.1, false}}
+	data[3] = &KVPair{3, &MyStruct{3.1, true}}
+	data[4] = &KVPair{4, &MyStruct{4.1, false}}
+	return data
+}
 
 func TestSetData(t *testing.T) {
-	expected := testData()
-	om := NewOrderedMap(expected)
+	expected := testStringInt()
+	om := NewOrderedMap()
 	if om == nil {
 		t.Error("Failed to create OrderedMap")
 	}
+
+	for _, kvp := range expected {
+		om.Set(kvp.Key, kvp.Value)
+	}
+
 	if len(om.store) != len(expected) {
 		t.Error("Failed insert of args:", om.store, expected)
 	}
 }
 
 func TestGetData(t *testing.T) {
-	data := testData()
-	om := NewOrderedMap(data)
+	data := testStringInt()
+	om := NewOrderedMapWithArgs(data)
 
 	for _, kvp := range data {
 		val, ok := om.Get(kvp.Key)
@@ -36,7 +55,6 @@ func TestGetData(t *testing.T) {
 			t.Error(kvp.Value, val)
 		}
 	}
-
 	_, ok := om.Get("invlalid-key")
 	if ok {
 		t.Error("Invalid key was found in OrderedMap")
@@ -47,8 +65,8 @@ func TestGetData(t *testing.T) {
 }
 
 func TestDeleteData(t *testing.T) {
-	data := testData()
-	om := NewOrderedMap(data)
+	data := testStringInt()
+	om := NewOrderedMapWithArgs(data)
 
 	testKey := data[2].Key
 
@@ -59,7 +77,7 @@ func TestDeleteData(t *testing.T) {
 	}
 
 	// Delete key
-	om.Delete(testKey.(string))
+	om.Delete(testKey)
 
 	// Test to see if removed
 	_, ok2 := om.Get(testKey)
@@ -69,8 +87,8 @@ func TestDeleteData(t *testing.T) {
 }
 
 func TestIterator(t *testing.T) {
-	sample := testData()
-	om := NewOrderedMap(sample)
+	sample := testStringInt()
+	om := NewOrderedMapWithArgs(sample)
 
 	iter := om.Iter()
 	if iter == nil {
