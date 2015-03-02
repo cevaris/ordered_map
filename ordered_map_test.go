@@ -59,7 +59,7 @@ func TestDeleteData(t *testing.T) {
 	}
 
 	// Delete key
-	om.Delete(testKey)
+	om.Delete(testKey.(string))
 
 	// Test to see if removed
 	_, ok2 := om.Get(testKey)

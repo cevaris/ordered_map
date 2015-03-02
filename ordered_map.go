@@ -12,18 +12,14 @@ import (
 // http://pymotw.com/2/collections/ordereddict.html
 
 type OrderedMap struct {
-	store map[string]int
-	mapper map[string]*Node
+	store map[interface{}]interface{}
+	mapper map[interface{}]*Node
 	root *Node
 }
 
-// type KeyValuePair interface {
-// 	Key()
-// 	Value()
-// }
 type KVPair struct {
-	Key string
-	Value int
+	Key interface{}
+	Value interface{}
 }
 
 func (k *KVPair) String() string {
@@ -32,8 +28,8 @@ func (k *KVPair) String() string {
 
 func NewOrderedMap(args []*KVPair) *OrderedMap {
 	om := &OrderedMap{
-		store: make(map[string]int),
-		mapper: make(map[string]*Node),
+		store: make(map[interface{}]interface{}),
+		mapper: make(map[interface{}]*Node),
 		root: NewRootNode(),
 	}
 	om.update(args)
@@ -46,7 +42,7 @@ func (om *OrderedMap) update(args []*KVPair) {
 	}
 }
 
-func (om *OrderedMap) Set(key string, value int) {
+func (om *OrderedMap) Set(key interface{}, value interface{}) {
 	if _, ok := om.store[key]; ok == false {
 		root := om.root
 		last := root.Prev
@@ -58,7 +54,7 @@ func (om *OrderedMap) Set(key string, value int) {
 	om.store[key] = value
 }
 
-func (om *OrderedMap) Get(key string) (int, bool) {
+func (om *OrderedMap) Get(key interface{}) (interface{}, bool) {
 	val, ok := om.store[key]
 	return val, ok
 }
