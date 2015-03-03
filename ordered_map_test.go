@@ -4,15 +4,6 @@ import (
 	"testing"
 )
 
-func testStringInt() []*KVPair {
-	var data []*KVPair = make([]*KVPair, 5)
-	data[0] = &KVPair{"test0", 0}
-	data[1] = &KVPair{"test1", 1}
-	data[2] = &KVPair{"test2", 2}
-	data[3] = &KVPair{"test3", 3}
-	data[4] = &KVPair{"test4", 4}
-	return data
-}
 
 type MyStruct struct {
 	a float64
@@ -28,6 +19,17 @@ func testIntStruct() []*KVPair {
 	data[4] = &KVPair{4, &MyStruct{4.1, false}}
 	return data
 }
+
+func testStringInt() []*KVPair {
+	var data []*KVPair = make([]*KVPair, 5)
+	data[0] = &KVPair{"test0", 0}
+	data[1] = &KVPair{"test1", 1}
+	data[2] = &KVPair{"test2", 2}
+	data[3] = &KVPair{"test3", 3}
+	data[4] = &KVPair{"test4", 4}
+	return data
+}
+
 
 func TestSetData(t *testing.T) {
 	expected := testStringInt()
@@ -59,9 +61,6 @@ func TestGetData(t *testing.T) {
 	if ok {
 		t.Error("Invalid key was found in OrderedMap")
 	}
-
-	t.Log(om)
-
 }
 
 func TestDeleteData(t *testing.T) {
@@ -100,6 +99,42 @@ func TestIterator(t *testing.T) {
 		expected := sample[index]
 		if !k.Compare(expected) {
 			t.Error(expected, k)
+		}
+		index++
+	}
+}
+
+
+
+
+
+func testString() []string {
+	var data []string = make([]string, 5)
+	data[0] = "test0"
+	data[1] = "test1"
+	data[2] = "test2"
+	data[3] = "test3"
+	data[4] = "test4"
+	return data
+}
+
+
+func TestAddData(t *testing.T) {
+	expected := testString()
+
+	ls := newRootNode()
+	if ls == nil {
+		t.Error("Failed to create LinkList")
+	}
+
+	for _, v := range expected {
+		ls.add(v)
+	}
+
+	index := 0
+	for v := range ls.iter() {
+		if v != expected[index] {
+			t.Error("Failed insert of args:", v, expected[index])
 		}
 		index++
 	}
