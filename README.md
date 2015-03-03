@@ -2,6 +2,7 @@
 
 OrderedMap is a Python port of OrderedDict implemented in golang.  
 
+
 ## Features
 - Full support Key/Value for all data types
 - Exposes an Iterator that iterates in order of insertion
@@ -68,8 +69,8 @@ for i:= 0; i < n; i++ {
 }
 
 // Iterate though values
-// - Values iteration are in insert order
-// - Returned in a key/value pair struct
+// - Values returned in insert order
+// - Values returned in a key/value pair struct
 for kv := range om.Iter() {
 	fmt.Println(kv, kv.Key, kv.Value)
 }
