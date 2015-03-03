@@ -1,14 +1,5 @@
 package ordered_map
 
-/*
-Sources
-o- https://github.com/twitter/commons/blob/master/src/python/twitter/common/collections/ordereddict.py
-- http://code.activestate.com/recipes/576693/
-- https://github.com/nicklockwood/OrderedDictionary/blob/master/OrderedDictionary/OrderedDictionary.m
-- http://golang.org/src/sort/sort.go?s=5371:5390#L223
-- http://pymotw.com/2/collections/ordereddict.html
-*/
-
 import (
 	"fmt"
 	"bytes"
@@ -49,7 +40,6 @@ func (om *OrderedMap) Set(key interface{}, value interface{}) {
 		last.Next = newNode(last, root, key)
 		root.Prev = last.Next
 		om.mapper[key] = last.Next
-		// fmt.Println(key, value, last.Key, last.Next.Key)
 	}
 	om.store[key] = value
 }
@@ -93,16 +83,12 @@ func (om *OrderedMap) Iter() <-chan *KVPair {
 		root := om.root
 		curr = root.Next
 		for curr != root {
-			v, _ := om.store[curr.Value.(string)]
-			keys <- &KVPair{curr.Value.(string), v}
+			v, _ := om.store[curr.Value]
+			keys <- &KVPair{curr.Value, v}
 			curr = curr.Next
 		}
 	}()
 	return keys
-}
-
-func (om1 *OrderedMap) Compare(om2 *OrderedMap) bool {
-	return true
 }
 
 
