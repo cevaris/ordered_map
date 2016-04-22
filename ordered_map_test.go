@@ -4,7 +4,6 @@ import (
 	"testing"
 )
 
-
 type MyStruct struct {
 	a float64
 	b bool
@@ -29,7 +28,6 @@ func testStringInt() []*KVPair {
 	data[4] = &KVPair{"test4", 4}
 	return data
 }
-
 
 func TestSetData(t *testing.T) {
 	expected := testStringInt()
@@ -104,10 +102,6 @@ func TestIterator(t *testing.T) {
 	}
 }
 
-
-
-
-
 func testString() []string {
 	var data []string = make([]string, 5)
 	data[0] = "test0"
@@ -117,7 +111,6 @@ func testString() []string {
 	data[4] = "test4"
 	return data
 }
-
 
 func TestAddData(t *testing.T) {
 	expected := testString()

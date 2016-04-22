@@ -1,22 +1,21 @@
 package ordered_map
 
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 )
 
-
 type OrderedMap struct {
-	store map[interface{}]interface{}
+	store  map[interface{}]interface{}
 	mapper map[interface{}]*node
-	root *node
+	root   *node
 }
 
 func NewOrderedMap() *OrderedMap {
 	om := &OrderedMap{
-		store: make(map[interface{}]interface{}),
+		store:  make(map[interface{}]interface{}),
 		mapper: make(map[interface{}]*node),
-		root: newRootNode(),
+		root:   newRootNode(),
 	}
 	return om
 }
@@ -64,7 +63,7 @@ func (om *OrderedMap) Delete(key interface{}) {
 }
 
 func (om *OrderedMap) String() string {
-	builder := make ([]string, len(om.store))
+	builder := make([]string, len(om.store))
 
 	var index int = 0
 	for k := range om.Iter() {
@@ -77,7 +76,7 @@ func (om *OrderedMap) String() string {
 
 func (om *OrderedMap) Iter() <-chan *KVPair {
 	keys := make(chan *KVPair)
-	go func(){
+	go func() {
 		defer close(keys)
 		var curr *node
 		root := om.root
@@ -96,8 +95,8 @@ func (om *OrderedMap) Len() int {
 }
 
 type node struct {
-	Prev *node
-	Next *node
+	Prev  *node
+	Next  *node
 	Value interface{}
 }
 
@@ -108,9 +107,8 @@ func newRootNode() *node {
 	return root
 }
 
-
 func newNode(prev *node, next *node, key interface{}) *node {
-	return &node{Prev: prev, Next: next, Value:key}
+	return &node{Prev: prev, Next: next, Value: key}
 }
 
 func (n *node) add(value string) {
@@ -135,12 +133,12 @@ func (n *node) String() string {
 		// Else, print pointer value
 		buffer.WriteString(fmt.Sprintf("%p, ", &n))
 	}
-	return fmt.Sprintf("LinkList[%v]",buffer.String())
+	return fmt.Sprintf("LinkList[%v]", buffer.String())
 }
 
 func (n *node) iter() <-chan string {
 	keys := make(chan string)
-	go func(){
+	go func() {
 		defer close(keys)
 		var curr *node
 		root := n
@@ -153,14 +151,8 @@ func (n *node) iter() <-chan string {
 	return keys
 }
 
-
-
-
-
-
-
 type KVPair struct {
-	Key interface{}
+	Key   interface{}
 	Value interface{}
 }
 
