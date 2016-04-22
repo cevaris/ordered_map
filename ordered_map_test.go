@@ -139,3 +139,20 @@ func TestAddData(t *testing.T) {
 		index++
 	}
 }
+
+func TestLenNonEmpty(t *testing.T) {
+	data := testStringInt()
+	om := NewOrderedMapWithArgs(data)
+
+	if om.Len() != len(data) {
+		t.Fatal("Unexpected length")
+	}
+}
+
+func TestLenEmpty(t *testing.T) {
+	om := NewOrderedMap()
+
+	if om.Len() != 0 {
+		t.Fatal("Unexpected length")
+	}
+}

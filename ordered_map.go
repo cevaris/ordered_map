@@ -91,8 +91,9 @@ func (om *OrderedMap) Iter() <-chan *KVPair {
 	return keys
 }
 
-
-
+func (om *OrderedMap) Len() int {
+	return len(om.store)
+}
 
 type node struct {
 	Prev *node
