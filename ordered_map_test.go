@@ -9,16 +9,6 @@ type MyStruct struct {
 	b bool
 }
 
-func testIntStruct() []*KVPair {
-	var data []*KVPair = make([]*KVPair, 5)
-	data[0] = &KVPair{0, &MyStruct{0.1, true}}
-	data[1] = &KVPair{1, &MyStruct{1.1, true}}
-	data[2] = &KVPair{2, &MyStruct{2.1, false}}
-	data[3] = &KVPair{3, &MyStruct{3.1, true}}
-	data[4] = &KVPair{4, &MyStruct{4.1, false}}
-	return data
-}
-
 func testStringInt() []*KVPair {
 	var data []*KVPair = make([]*KVPair, 5)
 	data[0] = &KVPair{"test0", 0}
@@ -86,7 +76,6 @@ func TestDeleteData(t *testing.T) {
 func TestIterator(t *testing.T) {
 	sample := testStringInt()
 	om := NewOrderedMapWithArgs(sample)
-
 	iter := om.Iter()
 	if iter == nil {
 		t.Error("Failed to create OrderedMap")
@@ -94,6 +83,25 @@ func TestIterator(t *testing.T) {
 
 	var index int = 0
 	for k := range iter {
+		expected := sample[index]
+		if !k.Compare(expected) {
+			t.Error(expected, k)
+		}
+		index++
+	}
+}
+
+func TestIteratorFunc(t *testing.T) {
+	sample := testStringInt()
+	om := NewOrderedMapWithArgs(sample)
+
+	iter := om.IterFunc()
+	if iter == nil {
+		t.Error("Failed to create OrderedMap")
+	}
+
+	var index int = 0
+	for k, ok := iter(); ok; k, ok = iter() {
 		expected := sample[index]
 		if !k.Compare(expected) {
 			t.Error(expected, k)
@@ -125,7 +133,8 @@ func TestAddData(t *testing.T) {
 	}
 
 	index := 0
-	for v := range ls.iter() {
+	iter := ls.IterFunc()
+	for v, ok := iter(); ok; v, ok = iter() {
 		if v != expected[index] {
 			t.Error("Failed insert of args:", v, expected[index])
 		}

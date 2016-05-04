@@ -35,24 +35,25 @@ func IteratorExample() {
 	n := 100
 	om := ordered_map.NewOrderedMap()
 
-	for i:= 0; i < n; i++ {
-		// Insert data into OrdereMap
-		om.Set(i, fmt.Sprintf("%d", i*i))
+	for i := 0; i < n; i++ {
+		// Insert data into OrderedMap
+		om.Set(i, fmt.Sprintf("%d", i * i))
 	}
 
 	// Iterate though values
 	// - Values iteration are in insert order
 	// - Returned in a key/value pair struct
-	for kv := range om.Iter() {
+	iter := om.IterFunc()
+	for kv, ok := iter(); ok; kv, ok = iter() {
 		fmt.Println(kv, kv.Key, kv.Value)
 	}
 }
-
 
 type MyStruct struct {
 	a int
 	b float64
 }
+
 func CustomStruct() {
 	om := ordered_map.NewOrderedMap()
 	om.Set("one", &MyStruct{1, 1.1})
@@ -63,8 +64,6 @@ func CustomStruct() {
 	// Ouput: OrderedMap[one:&{1 1.1},  two:&{2 2.2},  three:&{3 3.3}, ]
 
 }
-
-
 
 func main() {
 	GetAndSetExample()
