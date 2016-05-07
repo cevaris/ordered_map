@@ -63,16 +63,17 @@ func main() {
 n := 100
 om := ordered_map.NewOrderedMap()
 
-for i:= 0; i < n; i++ {
-	// Insert data into OrdereMap
-    om.Set(i, fmt.Sprintf("%d", i*ij))
+for i := 0; i < n; i++ {
+    // Insert data into OrderedMap
+    om.Set(i, fmt.Sprintf("%d", i * i))
 }
 
 // Iterate though values
-// - Values returned in insert order
-// - Values returned in a key/value pair struct
-for kv := range om.Iter() {
-	fmt.Println(kv, kv.Key, kv.Value)
+// - Values iteration are in insert order
+// - Returned in a key/value pair struct
+iter := om.IterFunc()
+for kv, ok := iter(); ok; kv, ok = iter() {
+    fmt.Println(kv, kv.Key, kv.Value)
 }
 ```
 

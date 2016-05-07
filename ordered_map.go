@@ -66,15 +66,17 @@ func (om *OrderedMap) String() string {
 	builder := make([]string, len(om.store))
 
 	var index int = 0
-	for k := range om.Iter() {
-		val, _ := om.Get(k.Key)
-		builder[index] = fmt.Sprintf("%v:%v, ", k.Key, val)
+	iter := om.IterFunc()
+	for kv, ok := iter(); ok; kv, ok = iter() {
+		val, _ := om.Get(kv.Key)
+		builder[index] = fmt.Sprintf("%v:%v, ", kv.Key, val)
 		index++
 	}
 	return fmt.Sprintf("OrderedMap%v", builder)
 }
 
 func (om *OrderedMap) Iter() <-chan *KVPair {
+	println("Iter() method is deprecated!. Use IterFunc() instead.")
 	keys := make(chan *KVPair)
 	go func() {
 		defer close(keys)
@@ -88,6 +90,21 @@ func (om *OrderedMap) Iter() <-chan *KVPair {
 		}
 	}()
 	return keys
+}
+
+func (om *OrderedMap) IterFunc() func() (*KVPair, bool) {
+	var curr *node
+	root := om.root
+	curr = root.Next
+	return func() (*KVPair, bool) {
+		for curr != root {
+			tmp := curr
+			curr = curr.Next
+			v, _ := om.store[tmp.Value]
+			return &KVPair{tmp.Value, v}, true
+		}
+		return nil, false
+	}
 }
 
 func (om *OrderedMap) Len() int {
@@ -136,19 +153,18 @@ func (n *node) String() string {
 	return fmt.Sprintf("LinkList[%v]", buffer.String())
 }
 
-func (n *node) iter() <-chan string {
-	keys := make(chan string)
-	go func() {
-		defer close(keys)
-		var curr *node
-		root := n
-		curr = root.Next
+func (n *node) IterFunc() func() (string, bool) {
+	var curr *node
+	root := n
+	curr = root.Next
+	return func() (string, bool) {
 		for curr != root {
-			keys <- curr.Value.(string)
+			tmp := curr.Value.(string)
 			curr = curr.Next
+			return tmp, true
 		}
-	}()
-	return keys
+		return "", false
+	}
 }
 
 type KVPair struct {
