@@ -76,6 +76,14 @@ func (om *OrderedMap) String() string {
 
 func (om *OrderedMap) Iter() <-chan *KVPair {
 	println("Iter() method is deprecated!. Use IterFunc() instead.")
+	return om.UnsafeIter()
+}
+
+/*
+Beware, Iterator leaks goroutines if we do not fully traverse the map.
+For most cases, `IterFunc()` should work as an iterator.
+ */
+func (om *OrderedMap) UnsafeIter() <-chan *KVPair {
 	keys := make(chan *KVPair)
 	go func() {
 		defer close(keys)
