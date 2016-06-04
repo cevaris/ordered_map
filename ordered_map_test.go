@@ -76,7 +76,7 @@ func TestDeleteData(t *testing.T) {
 func TestIterator(t *testing.T) {
 	sample := testStringInt()
 	om := NewOrderedMapWithArgs(sample)
-	iter := om.Iter()
+	iter := om.UnsafeIter()
 	if iter == nil {
 		t.Error("Failed to create OrderedMap")
 	}
