@@ -63,8 +63,24 @@ func TestDeleteData(t *testing.T) {
 		t.Error("Key/Value not found in OrderedMap")
 	}
 
+	// Assert size equal to "test data size"
+	if len(om.mapper) != len(data) {
+		t.Error("mapper size is incorrect")
+	}
+	if len(om.store) != len(data) {
+		t.Error("store size is incorrect")
+	}
+
 	// Delete key
 	om.Delete(testKey)
+
+	// Assert size equal to "test data size" - 1
+	if len(om.mapper) != (len(data) - 1) {
+		t.Error("mapper size is incorrect")
+	}
+	if len(om.store) != (len(data) - 1) {
+		t.Error("store size is incorrect")
+	}
 
 	// Test to see if removed
 	_, ok2 := om.Get(testKey)

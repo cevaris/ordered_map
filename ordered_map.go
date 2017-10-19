@@ -58,6 +58,7 @@ func (om *OrderedMap) Delete(key interface{}) {
 		next := root.Next
 		prev.Next = next
 		next.Prev = prev
+		delete(om.mapper, key)
 	}
 }
 
