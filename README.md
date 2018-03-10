@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cevaris/ordered_map.svg?branch=master)](https://travis-ci.org/cevaris/ordered_map)
 
-**OrderedMap** is a Python port of OrderedDict implemented in golang. Golang's builtin `map` purposefully randomizes the iteration of stored key/values. **OrderedMap**` struct preserves inserted key/value pairs; such that on iteration, key/value pairs are received in inserted (first in, first out) order.
+**OrderedMap** is a Python port of OrderedDict implemented in golang. Golang's builtin `map` purposefully randomizes the iteration of stored key/values. **OrderedMap** struct preserves inserted key/value pairs; such that on iteration, key/value pairs are received in inserted (first in, first out) order.
 
 
 ## Features
